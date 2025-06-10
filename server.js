@@ -8,7 +8,7 @@ import profileRoutes from './routes/profiles.js';
 import companyRoutes from './routes/companies.js';
 import categoryRoutes from './routes/categories.js';
 import jobRoutes from './routes/jobs.js';
-// import applicationRoutes from './routes/applications.js';
+import applicationRoutes from './routes/applications.js';
 
 dotenv.config();
 const app = express();
@@ -23,7 +23,7 @@ app.use('/api/profiles', profileRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/jobs', jobRoutes);
-// app.use('/api/applications', applicationRoutes);
+app.use('/api/applications', applicationRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running at ${PORT}`);
