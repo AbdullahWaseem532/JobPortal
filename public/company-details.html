@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Details</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #fa709a;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .company-content {
+            padding: 40px;
+        }
+
+        .company-overview {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 25px;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(250, 112, 154, 0.1), rgba(254, 225, 64, 0.1));
+            border-radius: 15px;
+            border: 2px solid rgba(250, 112, 154, 0.2);
+        }
+
+        .company-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fa709a, #fee140);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .company-basic-info h2 {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .company-industry {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, rgba(250, 112, 154, 0.2), rgba(254, 225, 64, 0.2));
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+
+        .company-website {
+            display: block;
+            margin-top: 10px;
+            color: #4facfe;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .company-website:hover {
+            text-decoration: underline;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .detail-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .detail-card.location {
+            border-left-color: #4facfe;
+        }
+
+        .detail-card.contact {
+            border-left-color: #43e97b;
+        }
+
+        .detail-card.size {
+            border-left-color: #fa709a;
+        }
+
+        .detail-card.system {
+            border-left-color: #667eea;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-item {
+            margin-bottom: 15px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            color: #333;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .detail-value.empty {
+            color: #999;
+            font-style: italic;
+        }
+
+        .description-section {
+            background: rgba(250, 112, 154, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 2px solid rgba(250, 112, 154, 0.1);
+        }
+
+        .description-section h3 {
+            color: #fa709a;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .description-text {
+            line-height: 1.6;
+            color: #555;
+            font-size: 1rem;
+        }
+
+        .employer-section {
+            background: rgba(79, 172, 254, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 2px solid rgba(79, 172, 254, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .employer-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .employer-info h3 {
+            color: #4facfe;
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+        }
+
+        .employer-email {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .error {
+            text-align: center;
+            padding: 50px 30px;
+            color: #e74c3c;
+            font-size: 1.1rem;
+        }
+
+        .error-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .company-content {
+                padding: 25px 20px;
+            }
+            
+            .company-overview {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .company-logo {
+                margin: 0 auto;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .back-btn {
+                position: static;
+                transform: none;
+                margin-bottom: 10px;
+                display: inline-block;
+            }
+            
+            .header {
+                padding: 20px;
+                text-align: center;
+            }
+            
+            .employer-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .employer-avatar {
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="companies.html" class="back-btn">
+                ← Back
+            </a>
+            <h1>🏢 Company Details</h1>
+            <p>Complete company information and profile</p>
+        </div>
+        
+        <div id="content">
+            <div class="loading">
+                <div class="spinner"></div>
+                Loading company details...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://literate-chainsaw-v6w9rw6jq9rj2xwqw-6006.app.github.dev';
+        
+        // Get company ID from URL parameters
+        function getCompanyIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+        
+        // Format date for display
+        function formatDate(dateString) {
+            if (!dateString) return 'Not specified';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+        
+        // Get company initials for logo
+        function getCompanyInitials(companyName) {
+            if (!companyName) return 'C';
+            
+            const words = companyName.split(' ');
+            if (words.length === 1) {
+                return words[0].charAt(0).toUpperCase();
+            }
+            
+            return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+        }
+        
+        // Get user initials for avatar
+        function getUserInitials(firstName, lastName, email) {
+            if (firstName && lastName) {
+                return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+            }
+            if (email) {
+                return email.charAt(0).toUpperCase();
+            }
+            return 'U';
+        }
+        
+        async function fetchCompany(companyId) {
+            const contentDiv = document.getElementById('content');
+            
+            if (!companyId) {
+                contentDiv.innerHTML = `
+                    <div class="error">
+                        <div class="error-icon">⚠️</div>
+                        <h3>No Company ID Provided</h3>
+                        <p>Please provide a valid company ID in the URL</p>
+                        <p>Example: company-details.html?id=1</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/companies/${companyId}`);
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('Company not found');
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const company = await response.json();
+                displayCompany(company);
+                
+            } catch (error) {
+                console.error('Error fetching company:', error);
+                contentDiv.innerHTML = `
+                    <div class="error">
+                        <div class="error-icon">⚠️</div>
+                        <h3>Failed to load company</h3>
+                        <p>Error: ${error.message}</p>
+                        <p>Make sure your API server is running on ${API_BASE_URL}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function displayCompany(company) {
+            const contentDiv = document.getElementById('content');
+            
+            // Get employer details if available
+            const employerName = company.employer 
+                ? `${company.employer.first_name || ''} ${company.employer.last_name || ''}`.trim() 
+                : '';
+                
+            const employerInitials = company.employer 
+                ? getUserInitials(company.employer.first_name, company.employer.last_name, company.employer.email)
+                : '';
+                
+            const companyInitials = getCompanyInitials(company.company_name);
+            
+            contentDiv.innerHTML = `
+                <div class="company-content">
+                    <div class="company-overview">
+                        <div class="company-logo">${companyInitials}</div>
+                        <div class="company-basic-info">
+                            <h2>${company.company_name || 'Unnamed Company'}</h2>
+                            ${company.industry 
+                                ? `<div class="company-industry">${company.industry}</div>` 
+                                : ''}
+                            ${company.website 
+                                ? `<a href="${company.website}" target="_blank" class="company-website">${company.website}</a>` 
+                                : ''}
+                        </div>
+                    </div>
+
+                    <div class="details-grid">
+                        <div class="detail-card location">
+                            <div class="card-title">
+                                📍 Location
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Address</span>
+                                <span class="detail-value ${!company.location ? 'empty' : ''}">${company.location || 'No location specified'}</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card size">
+                            <div class="card-title">
+                                👥 Company Size
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Number of Employees</span>
+                                <span class="detail-value ${!company.company_size ? 'empty' : ''}">${company.company_size || 'Not specified'}</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card system">
+                            <div class="card-title">
+                                ⚙️ System Information
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Company ID</span>
+                                <span class="detail-value">${company.company_id}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Created</span>
+                                <span class="detail-value">${formatDate(company.created_at)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${company.description ? `
+                        <div class="description-section">
+                            <h3>📝 Company Description</h3>
+                            <div class="description-text">${company.description}</div>
+                        </div>
+                    ` : ''}
+
+                    ${company.employer ? `
+                        <div class="employer-section">
+                            <div class="employer-avatar">${employerInitials}</div>
+                            <div class="employer-info">
+                                <h3>${employerName || 'Company Owner'}</h3>
+                                <div class="employer-email">${company.employer.email || 'No email provided'}</div>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        // Load company when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const companyId = getCompanyIdFromUrl();
+            fetchCompany(companyId);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobs List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4);
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 233, 123, 0.6);
+        }
+
+        .register-link {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4);
+        }
+
+        .register-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(250, 112, 154, 0.6);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4facfe;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .jobs-grid {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid transparent;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .user-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4facfe, #00f2fe, #43e97b);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .user-card:hover::before {
+            opacity: 1;
+        }
+
+        .user-id {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .user-email {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        .user-type {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .user-type.admin {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .user-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .user-phone, .user-location, .user-experience {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .user-meta {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .user-status {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .user-status.active {
+            background: rgba(67, 233, 123, 0.2);
+            color: #27ae60;
+        }
+
+        .user-status.inactive {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .user-created {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .user-type.job_seeker {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .user-type.employer {
+            background: linear-gradient(135deg, #fa709a, #fee140);
+            color: white;
+        }
+
+        .view-details {
+            text-align: center;
+            margin-top: 15px;
+            padding: 8px;
+            background: rgba(79, 172, 254, 0.1);
+            border-radius: 8px;
+            color: #4facfe;
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-card:hover .view-details {
+            opacity: 1;
+        }
+
+        .error {
+            text-align: center;
+            padding: 50px 30px;
+            color: #e74c3c;
+            font-size: 1.1rem;
+        }
+
+        .error-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .no-jobs {
+            text-align: center;
+            padding: 50px 30px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .jobs-grid {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .refresh-btn, .register-link {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👥 Jobs Management</h1>
+            <p>View and manage all registered jobs</p>
+        </div>
+        
+        <div class="controls">
+            <button class="refresh-btn" onclick="fetchJobs()">
+                🔄 Refresh Jobs
+            </button>
+            <a href="register.html" class="register-link">
+                ➕ Register New User
+            </a>
+        </div>
+        
+        <div id="content">
+            <div class="loading">
+                <div class="spinner"></div>
+                Loading jobs...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://literate-chainsaw-v6w9rw6jq9rj2xwqw-6006.app.github.dev'; // Adjust this to your API base URL
+        
+        async function fetchJobs() {
+            const contentDiv = document.getElementById('content');
+            
+            // Show loading state
+            contentDiv.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading jobs...
+                </div>
+            `;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/jobs`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const jobs = await response.json();
+                displayUsers(jobs);
+                
+            } catch (error) {
+                console.error('Error fetching jobs:', error);
+                contentDiv.innerHTML = `
+                    <div class="error">
+                        <div class="error-icon">⚠️</div>
+                        <h3>Failed to load jobs</h3>
+                        <p>Error: ${error.message}</p>
+                        <p>Make sure your API server is running on ${API_BASE_URL}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function displayUsers(jobs) {
+            const contentDiv = document.getElementById('content');
+            
+            if (!jobs || jobs.length === 0) {
+                contentDiv.innerHTML = `
+                    <div class="no-jobs">
+                        <h3>📭 No jobs found</h3>
+                    </div>
+                `;
+                return;
+            }
+            
+            const usersHTML = jobs.map(user => {
+                const fullName = user.first_name && user.last_name 
+                    ? `${user.first_name} ${user.last_name}` 
+                    : 'No profile';
+                    
+                const createdDate = new Date(user.created_at).toLocaleDateString();
+                const isActive = user.is_active ? '✅ Active' : '❌ Inactive';
+                
+                return `
+                    <div class="user-card" onclick="viewUser(${user.user_id})">
+                        <div class="user-id">ID: ${user.user_id}</div>
+                        <div class="user-email">${user.email}</div>
+                        <div class="user-name">${fullName}</div>
+                        ${user.phone ? `<div class="user-phone">📞 ${user.phone}</div>` : ''}
+                        ${user.location ? `<div class="user-location">📍 ${user.location}</div>` : ''}
+                        ${user.experience_years ? `<div class="user-experience">💼 ${user.experience_years} years experience</div>` : ''}
+                        <div class="user-meta">
+                            <div class="user-type ${user.user_type || 'job_seeker'}">${user.user_type || 'job_seeker'}</div>
+                            <div class="user-status ${user.is_active ? 'active' : 'inactive'}">${isActive}</div>
+                        </div>
+                        <div class="user-created">Joined: ${createdDate}</div>
+                        <div class="view-details"> <a href="${API_BASE_URL}/user-detail.html?id=${user.user_id}" target="_blank">👁️ Click to view details </a></div>
+                    </div>
+                `;
+            }).join('');
+            
+            contentDiv.innerHTML = `
+                <div class="jobs-grid">
+                    ${usersHTML}
+                </div>
+            `;
+        }
+        
+        // Load jobs when page loads
+        document.addEventListener('DOMContentLoaded', fetchJobs);
+    </script>
+</body>
+</html>

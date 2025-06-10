@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register User</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .profile-section, .company-section {
+            background: rgba(79, 172, 254, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 2px solid rgba(79, 172, 254, 0.1);
+        }
+
+        .company-section {
+            background: rgba(67, 233, 123, 0.05);
+            border: 2px solid rgba(67, 233, 123, 0.1);
+            display: none;
+        }
+
+        .profile-section h3, .company-section h3 {
+            color: #4facfe;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+
+        .company-section h3 {
+            color: #43e97b;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4);
+            margin-bottom: 20px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 233, 123, 0.6);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .alert.success {
+            background: rgba(67, 233, 123, 0.1);
+            color: #27ae60;
+            border: 2px solid rgba(67, 233, 123, 0.3);
+        }
+
+        .alert.error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 2px solid rgba(231, 76, 60, 0.3);
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .form-container {
+                padding: 30px 20px;
+            }
+            
+            .header {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>➕ Register User</h1>
+            <p>Create a new user account</p>
+        </div>
+        
+        <div class="form-container">
+            <div id="alert" class="alert"></div>
+            
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        required 
+                        placeholder="Enter email address"
+                    >
+                    <small>This will be used as the username for login</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required 
+                        placeholder="Enter password"
+                        minlength="6"
+                    >
+                    <small>Minimum 6 characters required</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="userType">User Type</label>
+                    <select id="userType" name="userType" required>
+                        <option value="">Select user type</option>
+                        <option value="job_seeker">Job Seeker</option>
+                        <option value="employer">Employer</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <small>Choose the appropriate role for this user</small>
+                </div>
+
+                <div class="profile-section" id="profileSection">
+                    <h3>Profile Information (Optional)</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <input 
+                                type="text" 
+                                id="firstName" 
+                                name="firstName" 
+                                placeholder="Enter first name"
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <input 
+                                type="text" 
+                                id="lastName" 
+                                name="lastName" 
+                                placeholder="Enter last name"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input 
+                                type="tel" 
+                                id="phone" 
+                                name="phone" 
+                                placeholder="Enter phone number"
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="experienceYears">Experience (Years)</label>
+                            <input 
+                                type="number" 
+                                id="experienceYears" 
+                                name="experienceYears" 
+                                min="0" 
+                                max="50"
+                                placeholder="0"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input 
+                            type="text" 
+                            id="location" 
+                            name="location" 
+                            placeholder="Enter location (e.g., City, Country)"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bio">Bio</label>
+                        <textarea 
+                            id="bio" 
+                            name="bio" 
+                            rows="4"
+                            placeholder="Tell us about yourself..."
+                        ></textarea>
+                        <small>Brief professional summary or personal bio</small>
+                    </div>
+                </div>
+
+                <!-- Company Section - Will be shown only for employer type -->
+                <div class="company-section" id="companySection">
+                    <h3>Company Information</h3>
+                    <div class="form-group">
+                        <label for="companyName">Company Name</label>
+                        <input 
+                            type="text" 
+                            id="companyName" 
+                            name="companyName" 
+                            placeholder="Enter company name"
+                        >
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="industry">Industry</label>
+                            <input 
+                                type="text" 
+                                id="industry" 
+                                name="industry" 
+                                placeholder="Enter industry (e.g., Technology, Healthcare)"
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="companySize">Company Size</label>
+                            <select id="companySize" name="companySize">
+                                <option value="">Select company size</option>
+                                <option value="1-10">1-10 employees</option>
+                                <option value="11-50">11-50 employees</option>
+                                <option value="51-200">51-200 employees</option>
+                                <option value="201-500">201-500 employees</option>
+                                <option value="501-1000">501-1000 employees</option>
+                                <option value="1001+">1001+ employees</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="website">Website</label>
+                        <input 
+                            type="url" 
+                            id="website" 
+                            name="website" 
+                            placeholder="Enter company website"
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="companyLocation">Company Location</label>
+                        <input 
+                            type="text" 
+                            id="companyLocation" 
+                            name="companyLocation" 
+                            placeholder="Enter company location"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Company Description</label>
+                        <textarea 
+                            id="description" 
+                            name="description" 
+                            rows="4"
+                            placeholder="Describe your company..."
+                        ></textarea>
+                        <small>Tell job seekers about your company mission, culture, and values</small>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <div class="btn-content">
+                        <div class="loading-spinner" id="loadingSpinner"></div>
+                        <span id="btnText">Create User</span>
+                    </div>
+                </button>
+            </form>
+            
+            <a href="users-list.html" class="back-link">
+                ← Back to Users List
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://literate-chainsaw-v6w9rw6jq9rj2xwqw-6006.app.github.dev'; // Adjust this to your API base URL
+        
+        // Show/hide company section based on user type selection
+        document.getElementById('userType').addEventListener('change', function() {
+            const companySection = document.getElementById('companySection');
+            
+            if (this.value === 'employer') {
+                companySection.style.display = 'block';
+            } else {
+                companySection.style.display = 'none';
+            }
+        });
+        
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const btnText = document.getElementById('btnText');
+            const alert = document.getElementById('alert');
+            
+            // Get form data
+            const formData = new FormData(this);
+            const userData = {
+                email: formData.get('email'),
+                password_hash: formData.get('password'), // Backend expects this field name
+                user_type: formData.get('userType')
+            };
+
+            // Add profile data if provided
+            const firstName = formData.get('firstName');
+            const lastName = formData.get('lastName');
+            const phone = formData.get('phone');
+            const location = formData.get('location');
+            const bio = formData.get('bio');
+            const experienceYears = formData.get('experienceYears');
+
+            if (firstName) userData.first_name = firstName;
+            if (lastName) userData.last_name = lastName;
+            if (phone) userData.phone = phone;
+            if (location) userData.location = location;
+            if (bio) userData.bio = bio;
+            if (experienceYears) userData.experience_years = parseInt(experienceYears);
+            
+            // Add company data if user type is employer
+            if (userData.user_type === 'employer') {
+                const companyName = formData.get('companyName');
+                
+                if (!companyName) {
+                    showAlert('Company Name is required for employer accounts', 'error');
+                    submitBtn.disabled = false;
+                    loadingSpinner.style.display = 'none';
+                    btnText.textContent = 'Create User';
+                    return;
+                }
+                
+                const companyData = {
+                    company_name: companyName,
+                    industry: formData.get('industry'),
+                    company_size: formData.get('companySize'),
+                    website: formData.get('website'),
+                    description: formData.get('description'),
+                    location: formData.get('companyLocation')
+                };
+                
+                // Add company data to user data
+                userData.company = companyData;
+            }
+            
+            // Basic validation
+            if (!userData.email || !userData.password_hash || !userData.user_type) {
+                showAlert('Please fill in all required fields (Email, Password, User Type)', 'error');
+                return;
+            }
+            
+            if (userData.password_hash.length < 6) {
+                showAlert('Password must be at least 6 characters long', 'error');
+                return;
+            }
+            
+            // If first name is provided, last name should also be provided
+            if ((firstName && !lastName) || (!firstName && lastName)) {
+                showAlert('Please provide both first name and last name, or leave both empty', 'error');
+                return;
+            }
+            
+            // Validate company name for employers
+            if (userData.user_type === 'employer' && !formData.get('companyName')) {
+                showAlert('Company Name is required for employer accounts', 'error');
+                return;
+            }
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            loadingSpinner.style.display = 'block';
+            btnText.textContent = 'Creating User...';
+            hideAlert();
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+                
+                const newUser = await response.json();
+                
+                // Show success message
+                const profileCreated = newUser.profile ? ' with profile' : '';
+                const companyCreated = newUser.company ? ' and company information' : '';
+                showAlert(`User created successfully${profileCreated}${companyCreated}! ID: ${newUser.user_id}`, 'success');
+                
+                // Reset form
+                document.getElementById('registerForm').reset();
+                document.getElementById('companySection').style.display = 'none';
+                
+                // Optionally redirect to users list after a delay
+                setTimeout(() => {
+                    window.location.href = 'users.html';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error creating user:', error);
+                showAlert(`Failed to create user: ${error.message}`, 'error');
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                loadingSpinner.style.display = 'none';
+                btnText.textContent = 'Create User';
+            }
+        });
+        
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+            
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    hideAlert();
+                }, 5000);
+            }
+        }
+        
+        function hideAlert() {
+            const alert = document.getElementById('alert');
+            alert.style.display = 'none';
+        }
+        
+        // Simple password strength indicator
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const small = this.nextElementSibling;
+            
+            if (password.length === 0) {
+                small.textContent = 'Minimum 6 characters required';
+                small.style.color = '#666';
+            } else if (password.length < 6) {
+                small.textContent = `${6 - password.length} more characters needed`;
+                small.style.color = '#e74c3c';
+            } else if (password.length < 8) {
+                small.textContent = 'Password strength: Fair';
+                small.style.color = '#f39c12';
+            } else {
+                small.textContent = 'Password strength: Good';
+                small.style.color = '#27ae60';
+            }
+        });
+    </script>
+</body>
+</html>
