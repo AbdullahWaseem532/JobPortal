@@ -199,45 +199,57 @@ router.put('/:id', async (req, res) => {
       phone,
       location,
       bio,
-      experience_years
+      experience_years,
+      resume_url
     } = req.body;
 
-    // Update user table
+    // Validate required fields
+    if (!email) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    // Update users table
     const userUpdateFields = [];
     const userValues = [];
-    let paramCount = 1;
+    let userParamCount = 1;
 
     if (email !== undefined) {
-      userUpdateFields.push(`email = $${paramCount++}`);
+      userUpdateFields.push(`email = $${userParamCount++}`);
       userValues.push(email);
     }
     if (user_type !== undefined) {
-      userUpdateFields.push(`user_type = $${paramCount++}`);
+      userUpdateFields.push(`user_type = $${userParamCount++}`);
       userValues.push(user_type);
     }
     if (is_active !== undefined) {
-      userUpdateFields.push(`is_active = $${paramCount++}`);
+      userUpdateFields.push(`is_active = $${userParamCount++}`);
       userValues.push(is_active);
     }
 
+    // Only update users table if there are fields to update
     if (userUpdateFields.length > 0) {
       userUpdateFields.push(`updated_at = CURRENT_TIMESTAMP`);
       userValues.push(id);
       
-      await client.query(
-        `UPDATE users SET ${userUpdateFields.join(', ')} WHERE user_id = $${paramCount}`,
-        userValues
-      );
+      const userUpdateQuery = `UPDATE users SET ${userUpdateFields.join(', ')} WHERE user_id = $${userParamCount}`;
+      await client.query(userUpdateQuery, userValues);
     }
 
-    // Update or create profile if profile data provided
-    if (first_name || last_name || phone || location || bio || experience_years !== undefined) {
-      const profileExists = await client.query(
+    // Handle profile updates
+    const hasProfileData = first_name !== undefined || last_name !== undefined || 
+                          phone !== undefined || location !== undefined || 
+                          bio !== undefined || experience_years !== undefined || 
+                          resume_url !== undefined;
+
+    if (hasProfileData) {
+      // Check if profile exists
+      const profileCheck = await client.query(
         'SELECT profile_id FROM user_profiles WHERE user_id = $1',
         [id]
       );
 
-      if (profileExists.rows.length > 0) {
+      if (profileCheck.rows.length > 0) {
         // Update existing profile
         const profileUpdateFields = [];
         const profileValues = [];
@@ -267,29 +279,51 @@ router.put('/:id', async (req, res) => {
           profileUpdateFields.push(`experience_years = $${profileParamCount++}`);
           profileValues.push(experience_years);
         }
+        if (resume_url !== undefined) {
+          profileUpdateFields.push(`resume_url = $${profileParamCount++}`);
+          profileValues.push(resume_url);
+        }
 
+        // Only update if there are fields to update
         if (profileUpdateFields.length > 0) {
           profileValues.push(id);
-          await client.query(
-            `UPDATE user_profiles SET ${profileUpdateFields.join(', ')} WHERE user_id = $${profileParamCount}`,
-            profileValues
-          );
+          const profileUpdateQuery = `UPDATE user_profiles SET ${profileUpdateFields.join(', ')} WHERE user_id = $${profileParamCount}`;
+          await client.query(profileUpdateQuery, profileValues);
         }
-      } else if (first_name && last_name) {
-        // Create new profile if first_name and last_name provided
-        await client.query(
-          `INSERT INTO user_profiles 
-           (user_id, first_name, last_name, phone, location, bio, experience_years) 
-           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-          [id, first_name, last_name, phone || null, location || null, bio || null, experience_years || 0]
-        );
+      } else {
+        // Create new profile - require at least first_name and last_name
+        if (first_name && last_name) {
+          const insertQuery = `
+            INSERT INTO user_profiles 
+            (user_id, first_name, last_name, phone, location, bio, experience_years, resume_url) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          `;
+          const insertValues = [
+            id, 
+            first_name, 
+            last_name, 
+            phone || null, 
+            location || null, 
+            bio || null, 
+            experience_years || 0,
+            resume_url || null
+          ];
+          await client.query(insertQuery, insertValues);
+        } else if (first_name !== undefined || last_name !== undefined) {
+          // If only one name is provided, that's an error
+          await client.query('ROLLBACK');
+          return res.status(400).json({ 
+            error: 'Both first_name and last_name are required to create a user profile' 
+          });
+        }
+        // If neither first_name nor last_name is provided, just skip profile creation
       }
     }
 
     await client.query('COMMIT');
 
-    // Fetch and return updated user
-    const { rows } = await client.query(`
+    // Fetch and return updated user with profile data
+    const fetchQuery = `
       SELECT 
         u.user_id,
         u.email,
@@ -308,16 +342,32 @@ router.put('/:id', async (req, res) => {
       FROM users u
       LEFT JOIN user_profiles p ON u.user_id = p.user_id
       WHERE u.user_id = $1
-    `, [id]);
+    `;
+    
+    const result = await client.query(fetchQuery, [id]);
 
-    res.json(rows[0]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json(result.rows[0]);
 
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Error updating user:', error);
     
     if (error.code === '23505') {
+      // Unique constraint violation (likely email)
       res.status(409).json({ error: 'Email already exists' });
+    } else if (error.code === '23502') {
+      // NOT NULL constraint violation
+      res.status(400).json({ error: 'Required field is missing' });
+    } else if (error.code === '23514') {
+      // Check constraint violation (likely user_type)
+      res.status(400).json({ error: 'Invalid user type. Must be job_seeker, employer, or admin' });
+    } else if (error.code === '22P02') {
+      // Invalid input syntax (e.g., invalid user_id)
+      res.status(400).json({ error: 'Invalid input data' });
     } else {
       res.status(500).json({ error: 'Failed to update user' });
     }

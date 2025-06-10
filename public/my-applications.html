@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .applications-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .application-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .application-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .application-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .job-title-company {
+            flex: 1;
+        }
+
+        .job-title {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+
+        .company-name {
+            font-size: 1rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .company-logo {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fa709a, #fee140);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .application-status {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.pending {
+            background: rgba(241, 196, 15, 0.1);
+            color: #f39c12;
+        }
+
+        .status-badge.reviewed {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+
+        .status-badge.shortlisted {
+            background: rgba(79, 172, 254, 0.1);
+            color: #4facfe;
+        }
+
+        .status-badge.rejected {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .status-badge.hired {
+            background: rgba(67, 233, 123, 0.1);
+            color: #27ae60;
+        }
+
+        .applied-date {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .application-body {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .job-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .job-badge {
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(67, 233, 123, 0.1);
+            color: #27ae60;
+        }
+
+        .job-badge.type {
+            background: rgba(79, 172, 254, 0.1);
+            color: #4facfe;
+        }
+
+        .job-badge.remote {
+            background: rgba(250, 112, 154, 0.1);
+            color: #fa709a;
+        }
+
+        .job-badge.location {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .cover-letter {
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.6;
+            margin-top: 10px;
+            padding: 15px;
+            background: rgba(79, 172, 254, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(79, 172, 254, 0.1);
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .cover-letter-toggle {
+            font-size: 0.9rem;
+            color: #4facfe;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            background: none;
+            border: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .application-footer {
+            padding: 15px 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(79, 172, 254, 0.02);
+        }
+
+        .action-btn {
+            background: white;
+            color: #4facfe;
+            border: 2px solid #4facfe;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-btn:hover {
+            background: rgba(79, 172, 254, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.delete {
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .action-btn.delete:hover {
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .status-timeline {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .timeline-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .timeline-bullet {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #e1e8ed;
+            position: relative;
+            z-index: 1;
+        }
+
+        .timeline-bullet.active {
+            background: #4facfe;
+        }
+
+        .timeline-label {
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 5px;
+            text-align: center;
+            width: 70px;
+        }
+
+        .timeline-label.active {
+            color: #4facfe;
+            font-weight: 600;
+        }
+
+        .timeline-line {
+            flex: 1;
+            height: 2px;
+            background: #e1e8ed;
+        }
+
+        .timeline-line.active {
+            background: #4facfe;
+        }
+
+        .no-applications {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .no-applications h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .no-applications p {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+        }
+
+        .browse-jobs-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .browse-jobs-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4facfe;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            text-align: center;
+            padding: 50px 30px;
+            color: #e74c3c;
+            font-size: 1.1rem;
+        }
+
+        .error-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-text {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .modal-btn.cancel {
+            background: #e1e8ed;
+            color: #555;
+        }
+
+        .modal-btn.confirm {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .content {
+                padding: 25px 20px;
+            }
+            
+            .navbar {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .application-header {
+                flex-direction: column;
+            }
+            
+            .application-status {
+                align-items: flex-start;
+            }
+            
+            .application-footer {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .status-timeline {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="nav-links">
+            <a href="jobs.html" class="nav-link">Jobs</a>
+            <a href="my-applications.html" class="nav-link active">My Applications</a>
+            <a href="profile.html" class="nav-link">My Profile</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📝 My Applications</h1>
+            <p>Track your job application status</p>
+        </div>
+        
+        <div class="content">
+            <div id="applicationsContainer" class="applications-grid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading your applications...
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const API_BASE_URL = 'https://literate-chainsaw-v6w9rw6jq9rj2xwqw-6006.app.github.dev';
+        
+        // Get user ID from URL parameters
+        function getUserIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('userId');
+        }
+        
+        // Format date for display
+        function formatDate(dateString) {
+            if (!dateString) return 'Unknown';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+        
+        // Get relative time for date
+        function getRelativeTime(dateString) {
+            const now = new Date();
+            const date = new Date(dateString);
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) {
+                return 'Today';
+            } else if (diffDays === 1) {
+                return 'Yesterday';
+            } else if (diffDays < 7) {
+                return `${diffDays} days ago`;
+            } else if (diffDays < 30) {
+                const weeks = Math.floor(diffDays / 7);
+                return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+            } else if (diffDays < 365) {
+                const months = Math.floor(diffDays / 30);
+                return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+            } else {
+                const years = Math.floor(diffDays / 365);
+                return `${years} ${years === 1 ? 'year' : 'years'} ago`;
+            }
+        }
+        
+        // Get company initials for logo
+        function getCompanyInitials(companyName) {
+            if (!companyName) return 'C';
+            
+            const words = companyName.split(' ');
+            if (words.length === 1) {
+                return words[0].charAt(0).toUpperCase();
+            }
+            
+            return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+        }
+        
+        // Format job type for display
+        function formatJobType(jobType) {
+            if (!jobType) return '';
+            return jobType.replace('-', ' ');
+        }
+        
+        // Get status steps and active states for timeline
+        function getStatusSteps(status) {
+            const steps = [
+                { name: 'Applied', active: true },
+                { name: 'Reviewed', active: ['reviewed', 'shortlisted', 'hired'].includes(status) },
+                { name: 'Shortlisted', active: ['shortlisted', 'hired'].includes(status) },
+                { name: 'Hired', active: status === 'hired' }
+            ];
+            
+            // Special case for rejected
+            if (status === 'rejected') {
+                return [
+                    { name: 'Applied', active: true },
+                    { name: 'Reviewed', active: true },
+                    { name: 'Rejected', active: true }
+                ];
+            }
+            
+            return steps;
+        }
+        
+        // Create status timeline
+        function createStatusTimeline(status) {
+            const steps = getStatusSteps(status);
+            
+            let timelineHTML = '';
+            
+            steps.forEach((step, index) => {
+                // Add bullet point
+                timelineHTML += `
+                    <div class="timeline-item">
+                        <div class="timeline-bullet ${step.active ? 'active' : ''}"></div>
+                        <div class="timeline-label ${step.active ? 'active' : ''}">${step.name}</div>
+                    </div>
+                `;
+                
+                // Add connecting line (except after last step)
+                if (index < steps.length - 1) {
+                    const nextStep = steps[index + 1];
+                    timelineHTML += `
+                        <div class="timeline-line ${step.active && nextStep.active ? 'active' : ''}"></div>
+                    `;
+                }
+            });
+            
+            return timelineHTML;
+        }
+        
+        // Toggle cover letter visibility
+        function toggleCoverLetter(applicationId) {
+            const coverLetter = document.getElementById(`coverLetter-${applicationId}`);
+            const toggleBtn = document.getElementById(`coverLetterToggle-${applicationId}`);
+            
+            if (coverLetter.style.maxHeight === '150px' || coverLetter.style.maxHeight === '') {
+                coverLetter.style.maxHeight = 'none';
+                toggleBtn.textContent = 'Show Less';
+            } else {
+                coverLetter.style.maxHeight = '150px';
+                toggleBtn.textContent = 'Show More';
+            }
+        }
+        
+        
+        async function fetchApplications(userId) {
+            const applicationsContainer = document.getElementById('applicationsContainer');
+            
+            if (!userId) {
+                applicationsContainer.innerHTML = `
+                    <div class="error">
+                        <div class="error-icon">⚠️</div>
+                        <h3>No User ID Provided</h3>
+                        <p>Please provide a valid user ID in the URL</p>
+                        <p>Example: my-applications.html?userId=1</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/applications/user/${userId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const applications = await response.json();
+                
+                // Display applications or no results message
+                if (applications.length === 0) {
+                    applicationsContainer.innerHTML = `
+                        <div class="no-applications">
+                            <h3>No Applications Found</h3>
+                            <p>You haven't applied to any jobs yet.</p>
+                            <a href="jobs.html" class="browse-jobs-btn">Browse Jobs</a>
+                        </div>
+                    `;
+                } else {
+                    applicationsContainer.innerHTML = '';
+                    
+                    // Sort applications by applied date (newest first)
+                    applications.sort((a, b) => new Date(b.applied_date) - new Date(a.applied_date));
+                    
+                    applications.forEach(application => {
+                        const companyInitials = getCompanyInitials(application.company_name);
+                        const appliedDate = getRelativeTime(application.applied_date);
+                        const appliedDateFormatted = formatDate(application.applied_date);
+                        const statusTimeline = createStatusTimeline(application.status);
+                        
+                        applicationsContainer.innerHTML += `
+                            <div class="application-card">
+                                <div class="application-header">
+                                    <div class="job-title-company">
+                                        <h3 class="job-title">${application.job_title}</h3>
+                                        <div class="company-name">
+                                            <div class="company-logo">${companyInitials}</div>
+                                            <span>${application.company_name || 'Unknown Company'}</span>
+                                        </div>
+                                    </div>
+                                    <div class="application-status">
+                                        <span class="status-badge ${application.status}">${application.status}</span>
+                                        <span class="applied-date">Applied ${appliedDate}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="application-body">
+                                    <div class="job-badges">
+                                        <div class="job-badge type">${formatJobType(application.job_type)}</div>
+                                        ${application.is_remote ? '<div class="job-badge remote">Remote</div>' : ''}
+                                        ${application.location ? `<div class="job-badge location">${application.location}</div>` : ''}
+                                    </div>
+                                    
+                                    <div class="status-timeline">
+                                        ${statusTimeline}
+                                    </div>
+                                    
+                                    ${application.cover_letter ? `
+                                        <h4 style="margin-top: 20px; color: #333;">Your Cover Letter</h4>
+                                        <div class="cover-letter" id="coverLetter-${application.application_id}">
+                                            ${application.cover_letter}
+                                        </div>
+                                        <button class="cover-letter-toggle" id="coverLetterToggle-${application.application_id}" onclick="toggleCoverLetter(${application.application_id})">
+                                            Show More
+                                        </button>
+                                    ` : ''}
+                                </div>
+                                
+                                <div class="application-footer">
+                                    <div>
+                                        <span>Applied on ${appliedDateFormatted}</span>
+                                    </div>
+                                    <div>
+                                        <a href="job-details.html?id=${application.job_id}" class="action-btn">
+                                            <span>👀</span> View Job
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error fetching applications:', error);
+                applicationsContainer.innerHTML = `
+                    <div class="error">
+                        <div class="error-icon">⚠️</div>
+                        <h3>Failed to load applications</h3>
+                        <p>Error: ${error.message}</p>
+                        <p>Make sure your API server is running on ${API_BASE_URL}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = getUserIdFromUrl();
+            fetchApplications(userId);
+            
+            
+        });
+    </script>
+</body>
+</html>
