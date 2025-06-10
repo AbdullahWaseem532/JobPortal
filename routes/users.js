@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Create a new user (with optional profile data)
+// Create a new user
 router.post('/', async (req, res) => {
   const client = await pool.connect();
   
@@ -50,17 +50,14 @@ router.post('/', async (req, res) => {
       location,
       bio,
       experience_years,
-      company  // This is the company object from the frontend
+      company 
     } = req.body;
 
-    // Validate required fields
     if (!email || !password_hash || !user_type) {
       return res.status(400).json({ 
         error: 'Email, password, and user type are required' 
       });
     }
-
-    // Validate user_type
     const validUserTypes = ['job_seeker', 'employer', 'admin'];
     if (!validUserTypes.includes(user_type)) {
       return res.status(400).json({ 
@@ -68,14 +65,12 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Validate company data for employer accounts
     if (user_type === 'employer' && (!company || !company.company_name)) {
       return res.status(400).json({
         error: 'Company name is required for employer accounts'
       });
     }
 
-    // Insert user
     const userResult = await client.query(
       'INSERT INTO users (email, password_hash, user_type) VALUES ($1, $2, $3) RETURNING *',
       [email, password_hash, user_type]
@@ -83,7 +78,6 @@ router.post('/', async (req, res) => {
 
     const newUser = userResult.rows[0];
 
-    // If profile data is provided, create profile
     let profileResult = null;
     if (first_name && last_name) {
       profileResult = await client.query(
@@ -102,7 +96,6 @@ router.post('/', async (req, res) => {
       );
     }
 
-    // If user is an employer and company data is provided, create company record
     let companyResult = null;
     if (user_type === 'employer' && company) {
       companyResult = await client.query(
@@ -123,7 +116,6 @@ router.post('/', async (req, res) => {
 
     await client.query('COMMIT');
 
-    // Return user with profile and company data if created
     const response = {
       ...newUser,
       profile: profileResult ? profileResult.rows[0] : null,
